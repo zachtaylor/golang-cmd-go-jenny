@@ -13,6 +13,9 @@ import (
 // Version is the module version number
 const Version = "v0.0.0"
 
+// Usage is the usage information
+const Usage = `usage: go-jenny [version] [-h|-help] [-f=<filepath>] [-i=<imports>] -p=<package> [-t=<typename>] -k=<keytype> -v=<valtype>`
+
 // newenv returns env.Values that are required
 func newenv() env.Values {
 	return env.Values{
@@ -23,11 +26,8 @@ func newenv() env.Values {
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Print(Usage)
-		return
-	} else if os.Args[1] == "version" {
-		fmt.Println("go-jenny version", Version)
+	if len(os.Args) > 1 && os.Args[1] == "version" {
+		fmt.Println("taylz.io/cmd/go-jenny@" + Version)
 		return
 	}
 
@@ -35,14 +35,14 @@ func main() {
 	env := newenv().ParseArgs(os.Args[1:])
 
 	if len(env["h"]) > 0 || len(env["help"]) > 0 {
-		fmt.Print(Usage)
+		fmt.Println(Usage)
 		return
 	}
 
 	for k := range env {
 		if env[k] == def[k] {
-			fmt.Println("go-jenny: requires:", k)
-			fmt.Print(Usage)
+			fmt.Println("missing required: -" + k)
+			fmt.Println(Usage)
 			return
 		}
 	}
@@ -59,7 +59,7 @@ func main() {
 
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
-		fmt.Println("go-jenny:", err)
+		fmt.Println(err)
 		return
 	}
 	defer file.Close()
